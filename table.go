@@ -69,12 +69,15 @@ func (t *Table) SimplifyBoard() bool {
 	// Exclusive Pair Elimination - (If two cells in a row, column, or box, 
 	// exclusively contain the same pair of options, no other cells in that 
 	// row, column, or box can possibly be either value)
+	// 
+	// AND Exclusive Triple Elimination - (If three cells in a row, column, or box, 
+	// exclusively contain the same triplets of options, no other cells in that 
+	// row, column, or box can possibly be either value)
 	for _, row := range rowCells {
 		for i1, cell := range row {
 			for i2, cell2 := range row {
 				if i1 != i2 && len(cell.possibilities) == 2 && len(cell2.possibilities) == 2 {
 					if EqualPossibilities(cell.possibilities, cell2.possibilities){
-						fmt.Println("Row hit EqualPossibilities")
 						var keys []string
 						for key := range cell.possibilities {
 							keys = append(keys, key)
@@ -87,6 +90,20 @@ func (t *Table) SimplifyBoard() bool {
 						}
 					} 
 				}
+				for i3, cell3 := range row {
+					if i1 != i2 && i1 != i3 && i2 != i3 && len(cell.possibilities) > 1 && len(cell.possibilities) < 4 && len(cell2.possibilities) > 1 && len(cell2.possibilities) < 4 && len(cell3.possibilities) > 1 && len(cell3.possibilities) < 4 {
+						if EqualTriplets(cell.possibilities, cell2.possibilities, cell3.possibilities){
+							triplet := GetTriplet(cell.possibilities, cell2.possibilities, cell3.possibilities)
+							for _, refs := range row {
+								if refs != cell && refs != cell2 && refs != cell3 {
+									refs.possibilities.RemovePossibility(triplet[0])
+									refs.possibilities.RemovePossibility(triplet[1])
+									refs.possibilities.RemovePossibility(triplet[2])
+								}
+							}
+						} 
+					}
+				}
 			}
 		}
 	}
@@ -96,7 +113,6 @@ func (t *Table) SimplifyBoard() bool {
 			for i2, cell2 := range col {
 				if i1 != i2 && len(cell.possibilities) == 2 && len(cell2.possibilities) == 2 {
 					if EqualPossibilities(cell.possibilities, cell2.possibilities){
-						fmt.Println("Col hit EqualPossibilities")
 						var keys []string
 						for key := range cell.possibilities {
 							keys = append(keys, key)
@@ -109,6 +125,20 @@ func (t *Table) SimplifyBoard() bool {
 						}
 					} 
 				}
+				for i3, cell3 := range col {
+					if i1 != i2 && i1 != i3 && i2 != i3 && len(cell.possibilities) > 1 && len(cell.possibilities) < 4 && len(cell2.possibilities) > 1 && len(cell2.possibilities) < 4 && len(cell3.possibilities) > 1 && len(cell3.possibilities) < 4 {
+						if EqualTriplets(cell.possibilities, cell2.possibilities, cell3.possibilities){
+							triplet := GetTriplet(cell.possibilities, cell2.possibilities, cell3.possibilities)
+							for _, refs := range col {
+								if refs != cell && refs != cell2 && refs != cell3 {
+									refs.possibilities.RemovePossibility(triplet[0])
+									refs.possibilities.RemovePossibility(triplet[1])
+									refs.possibilities.RemovePossibility(triplet[2])
+								}
+							}
+						} 
+					}
+				}
 			}
 		}
 	}
@@ -118,7 +148,6 @@ func (t *Table) SimplifyBoard() bool {
 			for i2, cell2 := range box {
 				if i1 != i2 && len(cell.possibilities) == 2 && len(cell2.possibilities) == 2 {
 					if EqualPossibilities(cell.possibilities, cell2.possibilities){
-						fmt.Println("Box hit EqualPossibilities")
 						var keys []string
 						for key := range cell.possibilities {
 							keys = append(keys, key)
@@ -130,6 +159,20 @@ func (t *Table) SimplifyBoard() bool {
 							}
 						}
 					} 
+				}
+				for i3, cell3 := range box {
+					if i1 != i2 && i1 != i3 && i2 != i3 && len(cell.possibilities) > 1 && len(cell.possibilities) < 4 && len(cell2.possibilities) > 1 && len(cell2.possibilities) < 4 && len(cell3.possibilities) > 1 && len(cell3.possibilities) < 4 {
+						if EqualTriplets(cell.possibilities, cell2.possibilities, cell3.possibilities){
+							triplet := GetTriplet(cell.possibilities, cell2.possibilities, cell3.possibilities)
+							for _, refs := range box {
+								if refs != cell && refs != cell2 && refs != cell3 {
+									refs.possibilities.RemovePossibility(triplet[0])
+									refs.possibilities.RemovePossibility(triplet[1])
+									refs.possibilities.RemovePossibility(triplet[2])
+								}
+							}
+						} 
+					}
 				}
 			}
 		}

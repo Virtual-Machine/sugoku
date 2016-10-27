@@ -37,6 +37,52 @@ func EqualPossibilities(pos1 Possibility, pos2 Possibility) bool {
 	return ret
 }
 
+func EqualTriplets(pos1 Possibility, pos2 Possibility, pos3 Possibility) bool {
+	ret := true
+	var keys []string
+	for k := range pos1 {
+		keys = append(keys, k)
+	}
+	for k := range pos2 {
+		keys = append(keys, k)
+	}
+	for k := range pos3 {
+		keys = append(keys, k)
+	}
+	keys = removeDuplicates(keys)
+	if len(keys) != 3 {
+		ret = false
+	}
+	return ret
+}
+
+func GetTriplet(pos1 Possibility, pos2 Possibility, pos3 Possibility) []string{
+	var keys []string
+	for k := range pos1 {
+		keys = append(keys, k)
+	}
+	for k := range pos2 {
+		keys = append(keys, k)
+	}
+	for k := range pos3 {
+		keys = append(keys, k)
+	}
+	keys = removeDuplicates(keys)
+	return keys
+}
+
+func removeDuplicates(xs []string) []string {
+	found := make(map[string]bool)
+	var newArray []string
+	for _, x := range xs {
+		if !found[x] {
+			found[x] = true
+			newArray = append(newArray, x)
+		}
+	}
+	return newArray
+}
+
 func (p *Possibility) RemovePossibility(val string){
 	delete(*p, val)
 }
