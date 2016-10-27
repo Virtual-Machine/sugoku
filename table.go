@@ -14,8 +14,11 @@ type Table struct {
 func (t *Table) PrintBoard(){
 	counter := 1
 	for _, v := range t.cells {
-		fmt.Print(v.val, " ")
-
+		if v.val == "X" {
+			fmt.Print("\033[31m", v.val, "\033[39m ")
+		} else {
+			fmt.Print("\033[32m", v.val, "\033[39m ")
+		}
 		counter++
 		if counter == 10 {
 			counter = 1
