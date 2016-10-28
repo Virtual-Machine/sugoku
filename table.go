@@ -28,6 +28,23 @@ func (t *Table) PrintBoard(){
 	fmt.Println("")
 }
 
+func (t *Table) PrintPossibilities(){
+	counter := 1
+	for _, v := range t.cells {
+		if v.val == "X" {
+			fmt.Print("\033[31m", v.possibilities, "\033[39m ")
+		} else {
+			fmt.Print("\033[32m", v.possibilities, "\033[39m ")
+		}
+		counter++
+		if counter == 10 {
+			counter = 1
+			fmt.Println("")
+		}
+	}
+	fmt.Println("")
+}
+
 func (t *Table) SimplifyBoard() bool {
 	simplified := false
 	var rowCells [10][]*Cell
@@ -76,6 +93,8 @@ func (t *Table) SimplifyBoard() bool {
 	// AND Exclusive Triple Elimination - (If three cells in a row, column, or box, 
 	// exclusively contain the same triplets of options, no other cells in that 
 	// row, column, or box can possibly be either value)
+	// AND Exclusive Quadruplets
+
 	for _, row := range rowCells {
 		for i1, cell := range row {
 			for i2, cell2 := range row {
@@ -105,6 +124,21 @@ func (t *Table) SimplifyBoard() bool {
 								}
 							}
 						} 
+					}
+					for i4, cell4 := range row {
+						if i1 != i2 && i1 != i3 && i1 != i4 && i2 != i3 && i2 != i4 && i3 != i4 && len(cell.possibilities) > 1 && len(cell.possibilities) < 5 && len(cell2.possibilities) > 1 && len(cell2.possibilities) < 5 && len(cell3.possibilities) > 1 && len(cell3.possibilities) < 5 && len(cell4.possibilities) > 1 && len(cell4.possibilities) < 5 {
+							if EqualQuadruplets(cell.possibilities, cell2.possibilities, cell3.possibilities, cell4.possibilities){
+								quadruplet := GetQuadruplet(cell.possibilities, cell2.possibilities, cell3.possibilities, cell4.possibilities)
+								for _, refs := range row {
+									if refs != cell && refs != cell2 && refs != cell3 && refs != cell4 {
+										refs.possibilities.RemovePossibility(quadruplet[0])
+										refs.possibilities.RemovePossibility(quadruplet[1])
+										refs.possibilities.RemovePossibility(quadruplet[2])
+										refs.possibilities.RemovePossibility(quadruplet[3])
+									}
+								}
+							}
+						}
 					}
 				}
 			}
@@ -179,7 +213,85 @@ func (t *Table) SimplifyBoard() bool {
 				}
 			}
 		}
-	}	
+	}
+
+	// Check for hidden singles in rows, cells, or boxes...
+	for _, row := range rowCells {
+		count := make(map[string]int)
+		for _, cell := range row {
+			for k := range cell.possibilities {
+				if count[k] == 0 {
+					count[k] = 1
+				} else {
+					count[k]++
+				}
+			}
+		}
+		for k, v := range count {
+			if v == 1 {
+				// Only one cell in row contains k
+				for _, cell := range row {
+					if cell.possibilities[k] == true {
+						simplified = true
+						cell.val = k
+						cell.possibilities = EmptyPossibility()
+					}
+				}
+			}
+		}
+	}
+	if !simplified {
+		for _, col := range colCells {
+			count := make(map[string]int)
+			for _, cell := range col {
+				for k := range cell.possibilities {
+					if count[k] == 0 {
+						count[k] = 1
+					} else {
+						count[k]++
+					}
+				}
+			}
+			for k, v := range count {
+				if v == 1 {
+					// Only one cell in col contains k
+					for _, cell := range col {
+						if cell.possibilities[k] == true {
+							simplified = true
+							cell.val = k
+							cell.possibilities = EmptyPossibility()
+						}
+					}
+				}
+			}
+		}
+	}
+	if !simplified {
+		for _, box := range boxCells {
+			count := make(map[string]int)
+			for _, cell := range box {
+				for k := range cell.possibilities {
+					if count[k] == 0 {
+						count[k] = 1
+					} else {
+						count[k]++
+					}
+				}
+			}
+			for k, v := range count {
+				if v == 1 {
+					// Only one cell in box contains k
+					for _, cell := range box {
+						if cell.possibilities[k] == true {
+							simplified = true
+							cell.val = k
+							cell.possibilities = EmptyPossibility()
+						}
+					}
+				}
+			}
+		}
+	}
 
 
 	for i, v := range t.cells {
@@ -192,5 +304,6 @@ func (t *Table) SimplifyBoard() bool {
 	}
 
 	t.PrintBoard()
+
 	return simplified
 }

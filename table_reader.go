@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	in, err := os.Open("puzzle.csv")
+	in, err := os.Open("puzzle4.csv")
 	
 	if err != nil {
 		log.Fatal("Could not open puzzle.csv")
@@ -45,11 +45,16 @@ func main() {
 		}
 		row++
 	}
-	for board.SimplifyBoard() {
-		log.Println("Simplying round", round)
-		round++
-	}
+	log.Println("Starting:")
 	board.PrintBoard()
+	log.Println("Simplying round", round)
+	for board.SimplifyBoard() {
+		round++
+		log.Println("Simplying round", round)
+	}
+	log.Println("Finishing:")
+	board.PrintBoard()
+	board.PrintPossibilities()
 }
 
 func getBox(col int, row int) int {

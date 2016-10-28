@@ -37,6 +37,46 @@ func EqualPossibilities(pos1 Possibility, pos2 Possibility) bool {
 	return ret
 }
 
+func EqualQuadruplets(pos1 Possibility, pos2 Possibility, pos3 Possibility, pos4 Possibility) bool {
+	ret := true
+	var keys []string
+	for k := range pos1 {
+		keys = append(keys, k)
+	}
+	for k := range pos2 {
+		keys = append(keys, k)
+	}
+	for k := range pos3 {
+		keys = append(keys, k)
+	}
+	for k := range pos4 {
+		keys = append(keys, k)
+	}
+	keys = removeDuplicates(keys)
+	if len(keys) != 4 {
+		ret = false
+	}
+	return ret
+}
+
+func GetQuadruplet(pos1 Possibility, pos2 Possibility, pos3 Possibility, pos4 Possibility) []string{
+	var keys []string
+	for k := range pos1 {
+		keys = append(keys, k)
+	}
+	for k := range pos2 {
+		keys = append(keys, k)
+	}
+	for k := range pos3 {
+		keys = append(keys, k)
+	}
+	for k := range pos4 {
+		keys = append(keys, k)
+	}
+	keys = removeDuplicates(keys)
+	return keys
+}
+
 func EqualTriplets(pos1 Possibility, pos2 Possibility, pos3 Possibility) bool {
 	ret := true
 	var keys []string
