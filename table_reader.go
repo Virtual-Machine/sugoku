@@ -40,14 +40,17 @@ func main() {
 			} else {
 				cell = Cell{row, col, box, v, EmptyPossibility()}
 			}
-			board.containers.rows[row - 1] = append(board.containers.rows[row - 1], &cell)
-			board.containers.cols[col - 1] = append(board.containers.cols[col - 1], &cell)
-			board.containers.boxes[box - 1] = append(board.containers.boxes[box - 1], &cell)
 			board.cells = append(board.cells, cell)
 		}
 		row++
-		board.RemoveOptions()
 	}
+	
+	for i, v := range board.cells {
+		board.containers.rows[v.row - 1] = append(board.containers.rows[v.row - 1], &(board.cells[i]))
+		board.containers.cols[v.col - 1] = append(board.containers.cols[v.col - 1], &(board.cells[i]))
+		board.containers.boxes[v.box - 1] = append(board.containers.boxes[v.box - 1], &(board.cells[i]))
+	}
+	board.RemoveOptions()
 	log.Println("Starting:")
 	board.PrintBoard()
 

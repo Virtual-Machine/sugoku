@@ -78,7 +78,13 @@ func (t *Table) SimplifyBoard(mode string) bool {
 	simplified = t.CheckExclusiveSingles(mode)
 	if simplified { return simplified }
 
+	// 2. Hidden singles.
+	simplified = t.CheckHiddenSingles(mode)
+	if simplified { return simplified }
 
+	// 3. Exclusive pairs.
+	simplified = t.CheckExclusivePairs(mode)
+	if simplified { return simplified }
 
 
 
@@ -102,6 +108,122 @@ func (t *Table) CheckExclusiveSingles(mode string) bool {
 			t.ClearOption(cell.row, cell.col, cell.box, value)
 			Explain(mode, "Found Exclusive Single... Row: " + strconv.Itoa(cell.row) + " Col: " + strconv.Itoa(cell.col) + " Val: " + value)
 		}
+	}
+	return simplified
+}
+
+func (t *Table) CheckHiddenSingles(mode string) bool {
+	simplified := false
+	for _, row := range t.containers.rows {
+		list := GetPossibilityList(row)
+		for k, v := range list {
+			if v == 1 {
+				for _, cell := range row {
+					if cell.HasPossibility(k){
+						simplified = true
+						cell.SetValue(k)
+						t.ClearOption(cell.row, cell.col, cell.box, k)
+						Explain(mode, "Found Hidden Row Single... Row: " + strconv.Itoa(cell.row) + " Col: " + strconv.Itoa(cell.col) + " Val: " + k)
+					}
+				}
+			}
+		} 
+	}
+	for _, col := range t.containers.cols {
+		list := GetPossibilityList(col)
+		for k, v := range list {
+			if v == 1 {
+				for _, cell := range col {
+					if cell.HasPossibility(k){
+						simplified = true
+						cell.SetValue(k)
+						t.ClearOption(cell.row, cell.col, cell.box, k)
+						Explain(mode, "Found Hidden Col Single... Row: " + strconv.Itoa(cell.row) + " Col: " + strconv.Itoa(cell.col) + " Val: " + k)
+					}
+				}
+			}
+		} 
+	}
+	for _, box := range t.containers.boxes {
+		list := GetPossibilityList(box)
+		for k, v := range list {
+			if v == 1 {
+				for _, cell := range box {
+					if cell.HasPossibility(k){
+						simplified = true
+						cell.SetValue(k)
+						t.ClearOption(cell.row, cell.col, cell.box, k)
+						Explain(mode, "Found Hidden Box Single... Row: " + strconv.Itoa(cell.row) + " Col: " + strconv.Itoa(cell.col) + " Val: " + k)
+					}
+				}
+			}
+		} 
+	}
+	return simplified
+}
+
+func (t *Table) CheckExclusivePairs(mode string) bool {
+	simplified := false
+	for _, row := range t.containers.rows {
+		for i1, cell1 := range row {
+			for i2, cell2 := range row {
+				if i1 != i2 && cell1.PossibilityCount() > 1 && cell2.PossibilityCount() > 1 && ContainsCompatibleSet(*cell1, *cell2){
+					possibilities := cell1.GetPossibilities()
+					
+					for i3, cell3 := range row {
+						if i3 != i1 && i3 != i2 {
+							if cell3.HasPossibility(possibilities[0]) || cell3.HasPossibility(possibilities[1]){
+								cell3.RemovePossibility(possibilities[0])
+								cell3.RemovePossibility(possibilities[1])
+								simplified = true
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	for _, col := range t.containers.cols {
+		for i1, cell1 := range col {
+			for i2, cell2 := range col {
+				if i1 != i2 && cell1.PossibilityCount() > 1 && cell2.PossibilityCount() > 1 && ContainsCompatibleSet(*cell1, *cell2){
+					possibilities := cell1.GetPossibilities()
+					
+					for i3, cell3 := range col {
+						if i3 != i1 && i3 != i2 {
+							if cell3.HasPossibility(possibilities[0]) || cell3.HasPossibility(possibilities[1]){
+								cell3.RemovePossibility(possibilities[0])
+								cell3.RemovePossibility(possibilities[1])
+								simplified = true
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	for _, box := range t.containers.boxes {
+		for i1, cell1 := range box {
+			for i2, cell2 := range box {
+				if i1 != i2 && cell1.PossibilityCount() > 1 && cell2.PossibilityCount() > 1 && ContainsCompatibleSet(*cell1, *cell2){
+					possibilities := cell1.GetPossibilities()
+					
+					for i3, cell3 := range box {
+						if i3 != i1 && i3 != i2 {
+							if cell3.HasPossibility(possibilities[0]) || cell3.HasPossibility(possibilities[1]){
+								cell3.RemovePossibility(possibilities[0])
+								cell3.RemovePossibility(possibilities[1])
+								simplified = true
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if simplified {
+		Explain(mode, "Excluded based on exclusive pairs")
 	}
 	return simplified
 }

@@ -1,6 +1,5 @@
 package main
 
-
 type Container struct {
 	rows [9][]*Cell
 	cols [9][]*Cell

@@ -13,11 +13,19 @@ func (c *Cell) RemovePossibility(val string){
 }
 
 func (c *Cell) GetPossibility() string {
-	keys := make([]string, len(c.possibilities))
+	var keys []string
 	for k := range c.possibilities {
 		keys = append(keys, k)
 	}
-	return keys[1]
+	return keys[0]
+}
+
+func (c *Cell) GetPossibilities() []string {
+	var keys []string
+	for k := range c.possibilities {
+		keys = append(keys, k)
+	}
+	return keys
 }
 
 func (c *Cell) HasPossibility(val string) bool{
@@ -31,4 +39,19 @@ func (c *Cell) PossibilityCount() int{
 func (c *Cell) SetValue(val string){
 	c.val = val
 	c.possibilities = EmptyPossibility()
+}
+
+func ContainsCompatibleSet(cells ...Cell) bool{
+
+	count := len(cells)
+	possibilityList := make(map[string]bool)
+	for _, cell := range cells {
+		for k := range cell.possibilities {
+			possibilityList[k] = true
+		}
+	}
+	if len(possibilityList) == count {
+		return true
+	}
+	return false
 }
