@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	in, err := os.Open("puzzle4.csv")
+	in, err := os.Open("puzzle5.csv")
 	
 	if err != nil {
 		log.Fatal("Could not open puzzle.csv")
@@ -40,15 +40,20 @@ func main() {
 			} else {
 				cell = Cell{row, col, box, v, EmptyPossibility()}
 			}
-			
+			board.containers.rows[row - 1] = append(board.containers.rows[row - 1], &cell)
+			board.containers.cols[col - 1] = append(board.containers.cols[col - 1], &cell)
+			board.containers.boxes[box - 1] = append(board.containers.boxes[box - 1], &cell)
 			board.cells = append(board.cells, cell)
 		}
 		row++
+		board.RemoveOptions()
 	}
 	log.Println("Starting:")
 	board.PrintBoard()
+
 	log.Println("Simplying round", round)
-	for board.SimplifyBoard() {
+	// HARDCODE EXPLAIN
+	for board.SimplifyBoard("EXPLAIN") {
 		round++
 		log.Println("Simplying round", round)
 	}
