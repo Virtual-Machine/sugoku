@@ -20,6 +20,13 @@ func (c *Cell) GetPossibility() string {
 	return keys[0]
 }
 
+func (c *Cell) SetPossibilities(possibilities ...string) {
+	c.possibilities = EmptyPossibility()
+	for _, i := range possibilities {
+		c.possibilities[i] = true
+	}
+}
+
 func (c *Cell) GetPossibilities() []string {
 	var keys []string
 	for k := range c.possibilities {

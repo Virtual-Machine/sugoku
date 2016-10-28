@@ -86,6 +86,10 @@ func (t *Table) SimplifyBoard(mode string) bool {
 	simplified = t.CheckExclusivePairs(mode)
 	if simplified { return simplified }
 
+	// 4. Hidden pairs.
+	simplified = t.CheckHiddenPairs(mode)
+	if simplified { return simplified }
+
 
 
 
@@ -224,6 +228,84 @@ func (t *Table) CheckExclusivePairs(mode string) bool {
 
 	if simplified {
 		Explain(mode, "Excluded based on exclusive pairs")
+	}
+	return simplified
+}
+
+func (t *Table) CheckHiddenPairs(mode string) bool {
+	simplified := false
+	for _, row := range t.containers.rows {
+		list := GetPossibilityList(row)
+
+		for k, v := range list {
+			for k2, v2 := range list {
+				if k != k2 && v == 2 && v2 == 2 {
+					for i1, cell := range row {
+						for i2, cell2 := range row {
+							if i1 != i2 {
+								if cell.HasPossibility(k) && cell.HasPossibility(k2) && cell2.HasPossibility(k) && cell2.HasPossibility(k2) {
+									if cell.PossibilityCount() > 2 || cell2.PossibilityCount() > 2 {
+										simplified = true
+										cell.SetPossibilities(k, k2)
+										cell2.SetPossibilities(k, k2)
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	for _, col := range t.containers.cols {
+		list := GetPossibilityList(col)
+
+		for k, v := range list {
+			for k2, v2 := range list {
+				if k != k2 && v == 2 && v2 == 2 {
+					for i1, cell := range col {
+						for i2, cell2 := range col {
+							if i1 != i2 {
+								if cell.HasPossibility(k) && cell.HasPossibility(k2) && cell2.HasPossibility(k) && cell2.HasPossibility(k2) {
+									if cell.PossibilityCount() > 2 || cell2.PossibilityCount() > 2 {
+										simplified = true
+										cell.SetPossibilities(k, k2)
+										cell2.SetPossibilities(k, k2)
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	for _, box := range t.containers.boxes {
+		list := GetPossibilityList(box)
+
+		for k, v := range list {
+			for k2, v2 := range list {
+				if k != k2 && v == 2 && v2 == 2 {
+					for i1, cell := range box {
+						for i2, cell2 := range box {
+							if i1 != i2 {
+								if cell.HasPossibility(k) && cell.HasPossibility(k2) && cell2.HasPossibility(k) && cell2.HasPossibility(k2) {
+									if cell.PossibilityCount() > 2 || cell2.PossibilityCount() > 2 {
+										simplified = true
+										cell.SetPossibilities(k, k2)
+										cell2.SetPossibilities(k, k2)
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if simplified {
+		Explain(mode, "Excluded based on hidden pairs")
 	}
 	return simplified
 }
