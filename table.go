@@ -90,8 +90,13 @@ func (t *Table) SimplifyBoard(mode string) bool {
 	simplified = t.CheckHiddenPairs(mode)
 	if simplified { return simplified }
 
+	// 5. Exclusive triplets.
+	simplified = t.CheckExclusiveTriplets(mode)
+	if simplified { return simplified }
 
-
+	// 6. Hidden triplets.
+	simplified = t.CheckHiddenTriplets(mode)
+	if simplified { return simplified }
 
 	return simplified
 }
@@ -306,6 +311,175 @@ func (t *Table) CheckHiddenPairs(mode string) bool {
 
 	if simplified {
 		Explain(mode, "Excluded based on hidden pairs")
+	}
+	return simplified
+}
+
+func (t *Table) CheckExclusiveTriplets(mode string) bool {
+	simplified := false
+	for _, row := range t.containers.rows {
+		for i1, cell1 := range row {
+			for i2, cell2 := range row {
+				for i3, cell3 := range row {
+					if i1 != i2 && i2 != i3 && i1 != i3 && cell1.PossibilityCount() > 1 && cell2.PossibilityCount() > 1 && cell3.PossibilityCount() > 1 && ContainsCompatibleSet(*cell1, *cell2, *cell3){
+						possibilities := cell1.GetPossibilities(*cell2, *cell3)
+						
+						for i4, cell4 := range row {
+							if i4 != i1 && i4 != i2 && i4 != i3 {
+								if cell4.HasPossibility(possibilities[0]) || cell4.HasPossibility(possibilities[1]) || cell4.HasPossibility(possibilities[2]){
+									cell4.RemovePossibility(possibilities[0])
+									cell4.RemovePossibility(possibilities[1])
+									cell4.RemovePossibility(possibilities[2])
+									simplified = true
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	for _, col := range t.containers.cols {
+		for i1, cell1 := range col {
+			for i2, cell2 := range col {
+				for i3, cell3 := range col {
+					if i1 != i2 && i2 != i3 && i1 != i3 && cell1.PossibilityCount() > 1 && cell2.PossibilityCount() > 1 && cell3.PossibilityCount() > 1 && ContainsCompatibleSet(*cell1, *cell2, *cell3){
+						possibilities := cell1.GetPossibilities(*cell2, *cell3)
+						
+						for i4, cell4 := range col {
+							if i4 != i1 && i4 != i2 && i4 != i3 {
+								if cell4.HasPossibility(possibilities[0]) || cell4.HasPossibility(possibilities[1]) || cell4.HasPossibility(possibilities[2]){
+									cell4.RemovePossibility(possibilities[0])
+									cell4.RemovePossibility(possibilities[1])
+									cell4.RemovePossibility(possibilities[2])
+									simplified = true
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	for _, box := range t.containers.boxes {
+		for i1, cell1 := range box {
+			for i2, cell2 := range box {
+				for i3, cell3 := range box {
+					if i1 != i2 && i2 != i3 && i1 != i3 && cell1.PossibilityCount() > 1 && cell2.PossibilityCount() > 1 && cell3.PossibilityCount() > 1 && ContainsCompatibleSet(*cell1, *cell2, *cell3){
+						possibilities := cell1.GetPossibilities(*cell2, *cell3)
+						
+						for i4, cell4 := range box {
+							if i4 != i1 && i4 != i2 && i4 != i3 {
+								if cell4.HasPossibility(possibilities[0]) || cell4.HasPossibility(possibilities[1]) || cell4.HasPossibility(possibilities[2]){
+									cell4.RemovePossibility(possibilities[0])
+									cell4.RemovePossibility(possibilities[1])
+									cell4.RemovePossibility(possibilities[2])
+									simplified = true
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if simplified {
+		Explain(mode, "Excluded based on exclusive triplets")
+	}
+	return simplified
+}
+
+func (t *Table) CheckHiddenTriplets(mode string) bool {
+	simplified := false
+	for _, row := range t.containers.rows {
+		list := GetPossibilityList(row)
+
+		for k, v := range list {
+			for k2, v2 := range list {
+				for k3, v3 := range list {
+					if k != k2 && k != k3 && k2 != k3 && v <= 3 && v2 <= 3 && v3 <= 3 {
+						for i1, cell := range row {
+							for i2, cell2 := range row {
+								for i3, cell3 := range row {
+									if i1 != i2 && i2 != i3 && i1 != i3 {
+										newList := GetPossibilityListPartial(*cell, *cell2, *cell3)
+										if newList[k] == v && newList[k2] == v2 && newList[k3] == v3 && len(newList) > 3 {
+											simplified = true
+											cell.OnlyPossibilities(k, k2, k3)
+											cell2.OnlyPossibilities(k, k2, k3)
+											cell3.OnlyPossibilities(k, k2, k3)	
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	for _, col := range t.containers.cols {
+		list := GetPossibilityList(col)
+
+		for k, v := range list {
+			for k2, v2 := range list {
+				for k3, v3 := range list {
+					if k != k2 && k != k3 && k2 != k3 && v <= 3 && v2 <= 3 && v3 <= 3 {
+						for i1, cell := range col {
+							for i2, cell2 := range col {
+								for i3, cell3 := range col {
+									if i1 != i2 && i2 != i3 && i1 != i3 {
+										newList := GetPossibilityListPartial(*cell, *cell2, *cell3)
+										if newList[k] == v && newList[k2] == v2 && newList[k3] == v3 && len(newList) > 3 {
+											simplified = true
+											cell.OnlyPossibilities(k, k2, k3)
+											cell2.OnlyPossibilities(k, k2, k3)
+											cell3.OnlyPossibilities(k, k2, k3)	
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	for _, box := range t.containers.boxes {
+		list := GetPossibilityList(box)
+
+		for k, v := range list {
+			for k2, v2 := range list {
+				for k3, v3 := range list {
+					if k != k2 && k != k3 && k2 != k3 && v <= 3 && v2 <= 3 && v3 <= 3 {
+						for i1, cell := range box {
+							for i2, cell2 := range box {
+								for i3, cell3 := range box {
+									if i1 != i2 && i2 != i3 && i1 != i3 {
+										newList := GetPossibilityListPartial(*cell, *cell2, *cell3)
+										if newList[k] == v && newList[k2] == v2 && newList[k3] == v3 && len(newList) > 3 {
+											simplified = true
+											cell.OnlyPossibilities(k, k2, k3)
+											cell2.OnlyPossibilities(k, k2, k3)
+											cell3.OnlyPossibilities(k, k2, k3)	
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if simplified {
+		Explain(mode, "Excluded based on hidden triplets")
 	}
 	return simplified
 }
