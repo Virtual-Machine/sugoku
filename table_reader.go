@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	in, err := os.Open("puzzle4.csv")
+	in, err := os.Open("elite_puzzle.csv")
 	
 	if err != nil {
 		log.Fatal("Could not open puzzle.csv")
