@@ -1,20 +1,20 @@
 package main
 
 import (
-	"encoding/csv"
-	"log"
-	"io"
 	"bufio"
+	"encoding/csv"
+	"io"
+	"log"
 	"os"
 )
 
 func main() {
 	in, err := os.Open("elite_puzzle.csv")
-	
+
 	if err != nil {
 		log.Fatal("Could not open puzzle.csv")
 	}
-	
+
 	r := csv.NewReader(bufio.NewReader(in))
 
 	var board Table
@@ -44,11 +44,11 @@ func main() {
 		}
 		row++
 	}
-	
+
 	for i, v := range board.cells {
-		board.containers.rows[v.row - 1] = append(board.containers.rows[v.row - 1], &(board.cells[i]))
-		board.containers.cols[v.col - 1] = append(board.containers.cols[v.col - 1], &(board.cells[i]))
-		board.containers.boxes[v.box - 1] = append(board.containers.boxes[v.box - 1], &(board.cells[i]))
+		board.containers.rows[v.row-1] = append(board.containers.rows[v.row-1], &(board.cells[i]))
+		board.containers.cols[v.col-1] = append(board.containers.cols[v.col-1], &(board.cells[i]))
+		board.containers.boxes[v.box-1] = append(board.containers.boxes[v.box-1], &(board.cells[i]))
 	}
 	board.RemoveOptions()
 	log.Println("Starting:")

@@ -1,17 +1,20 @@
 package main
 
+// Cell is the representation of one cell in the 81 cell matrix.
 type Cell struct {
-	row		int
-	col     int
-	box     int
-	val     string
+	row           int
+	col           int
+	box           int
+	val           string
 	possibilities Possibility
 }
 
-func (c *Cell) RemovePossibility(val string){
+// RemovePossibility allows a cell to exclude a possibility from its set.
+func (c *Cell) RemovePossibility(val string) {
 	delete(c.possibilities, val)
 }
 
+// GetPossibility returns the first possibility in the set, used to retrieve final value.
 func (c *Cell) GetPossibility() string {
 	var keys []string
 	for k := range c.possibilities {
@@ -20,6 +23,7 @@ func (c *Cell) GetPossibility() string {
 	return keys[0]
 }
 
+// SetPossibilities forces a cells possibility to the given set of possibilities.
 func (c *Cell) SetPossibilities(possibilities ...string) {
 	c.possibilities = EmptyPossibility()
 	for _, i := range possibilities {
@@ -27,6 +31,7 @@ func (c *Cell) SetPossibilities(possibilities ...string) {
 	}
 }
 
+// OnlyPossibilities forces a cells possibility to the given set of possibilities but does not add to the set if the possibility is already excluded.
 func (c *Cell) OnlyPossibilities(possibilities ...string) {
 	for k := range c.possibilities {
 		hit := false
@@ -41,6 +46,7 @@ func (c *Cell) OnlyPossibilities(possibilities ...string) {
 	}
 }
 
+// GetPossibilities returns the combined set of possibilities in a group.
 func (c *Cell) GetPossibilities(otherCells ...Cell) []string {
 	var keys []string
 	for k := range c.possibilities {
@@ -62,20 +68,24 @@ func (c *Cell) GetPossibilities(otherCells ...Cell) []string {
 	return keys
 }
 
-func (c *Cell) HasPossibility(val string) bool{
+// HasPossibility returns true if possibility is possible in a cell.
+func (c *Cell) HasPossibility(val string) bool {
 	return c.possibilities[val]
 }
 
-func (c *Cell) PossibilityCount() int{
+// PossibilityCount returns the total number of possibilities left for a cell.
+func (c *Cell) PossibilityCount() int {
 	return len(c.possibilities)
 }
 
-func (c *Cell) SetValue(val string){
+// SetValue removes all remaining possibilities and sets the value for the cell.
+func (c *Cell) SetValue(val string) {
 	c.val = val
 	c.possibilities = EmptyPossibility()
 }
 
-func ContainsCompatibleSet(cells ...Cell) bool{
+// ContainsCompatibleSet determines if a group of cells contain a combined possibility set that is equal to the number of cells, indicating that they are an exclusive set.
+func ContainsCompatibleSet(cells ...Cell) bool {
 
 	count := len(cells)
 	possibilityList := make(map[string]bool)

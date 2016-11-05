@@ -1,14 +1,16 @@
 package main
 
+// Possibility is the representation of valid possibilities of a cell.
 type Possibility map[string]bool
 
-
-func EmptyPossibility() Possibility{
+// EmptyPossibility creates a possibility set with no valid possibilities.
+func EmptyPossibility() Possibility {
 	m := make(Possibility)
 	return m
 }
 
-func FullPossibility() Possibility{
+// FullPossibility creates a possibility set with all valid possibilities.
+func FullPossibility() Possibility {
 	m := make(Possibility)
 	m["1"] = true
 	m["2"] = true
